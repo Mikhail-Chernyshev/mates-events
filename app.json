@@ -9,7 +9,14 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "AIzaSyD0a2YmiCre7yZskcyzYX5eYa_BqystEv4"
+      },
+      "bundleIdentifier": "com.anonymous.MatesEvents",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Это приложение использует ваше местоположение для отображения на карте и поиска друзей поблизости."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +26,14 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyD0a2YmiCre7yZskcyzYX5eYa_BqystEv4"
+        }
+      },
+      "package": "com.anonymous.MatesEvents",
+      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
     },
     "web": {
       "output": "static",

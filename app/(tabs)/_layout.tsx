@@ -15,19 +15,54 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
         tabBarButton: HapticTab,
-      }}>
+        tabBarStyle: {
+          height: 64, // Увеличиваем на 4px
+        },
+      }}
+    >
       <Tabs.Screen
-        name="index"
+        name='index'
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'Главная',
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name='house.fill' color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name='map'
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Карта',
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name='map.fill' color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name='events'
+        options={{
+          title: 'События',
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name='calendar' color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name='explore'
+        options={{
+          title: 'Друзья',
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name='person.2.fill' color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name='settings'
+        options={{
+          title: 'Настройки',
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name='gearshape.fill' color={color} />
+          ),
         }}
       />
     </Tabs>

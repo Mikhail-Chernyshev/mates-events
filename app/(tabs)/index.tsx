@@ -1,98 +1,248 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { EventCard } from '@/components/ui/event-card';
+import {
+  Friend,
+  FriendDetailsModal,
+} from '@/components/ui/friend-details-modal';
+import { FriendPin } from '@/components/ui/friend-pin';
+import { GlassContainer } from '@/components/ui/glass-container';
+import { Colors, Spacing } from '@/constants/theme';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const { user, logout } = useAuth();
+  const router = useRouter();
+  const [friendModalVisible, setFriendModalVisible] = useState(false);
+  const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
+  // Mock data for friends
+  const friends: Friend[] = [
+    {
+      id: '1',
+      name: 'Анна Петрова',
+      status: 'online',
+      distance: '500м',
+      lat: 55.7558,
+      lng: 37.6176,
+    },
+    {
+      id: '2',
+      name: 'Максим Иванов',
+      status: 'away',
+      distance: '1.2км',
+      lat: 55.76,
+      lng: 37.62,
+    },
+    {
+      id: '3',
+      name: 'Елена Сидорова',
+      status: 'online',
+      distance: '800м',
+      lat: 55.75,
+      lng: 37.615,
+    },
+  ];
+
+  const handleLogout = () => {
+    logout();
+  };
+
+  const handleFriendPress = (friend: Friend) => {
+    setSelectedFriend(friend);
+    setFriendModalVisible(true);
+  };
+
+  const handleMessageFriend = (friend: Friend) => {
+    alert(`Отправляем сообщение ${friend.name}`);
+  };
+
+  const handleNavigateToFriend = (friend: Friend) => {
+    router.push({
+      pathname: '/map',
+      params: { selectedFriendId: friend.id },
+    });
+    setFriendModalVisible(false);
+  };
+
+  const handleCallFriend = (friend: Friend) => {
+    alert(`Звоним ${friend.name}`);
+  };
+
+  return (
+    <ScrollView style={styles.container}>
+      {/* Welcome Section */}
+      <GlassContainer style={styles.welcomeSection} variant='elevated'>
+        <View style={styles.titleContainer}>
+          <ThemedText type='title' style={styles.welcomeTitle}>
+            Добро пожаловать в MatesEvents! 👋
+          </ThemedText>
+          <HelloWave />
+        </View>
+        <ThemedText style={styles.welcomeSubtitle}>
+          Ваша социальная сеть с картой и событиями
         </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
+      </GlassContainer>
+
+      {/* Recent Events */}
+      <GlassContainer style={styles.eventsSection} variant='elevated'>
+        <ThemedText type='subtitle' style={styles.sectionTitle}>
+          Ближайшие события
         </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={styles.eventsList}>
+            <EventCard
+              title='Корпоративная вечеринка'
+              description='Отмечаем успешный квартал в офисе'
+              date='15 декабря'
+              time='19:00'
+              location='Офис на Тверской'
+              category='corporate'
+              attendees={25}
+              onPress={() => alert('Открыть событие')}
+              style={styles.eventCard}
+            />
+
+            <EventCard
+              title='День рождения Алины'
+              description='Приглашаем всех на праздник!'
+              date='20 декабря'
+              time='18:30'
+              location="Ресторан 'У Алины'"
+              category='birthday'
+              attendees={12}
+              onPress={() => alert('Открыть событие')}
+              style={styles.eventCard}
+            />
+
+            <EventCard
+              title='Бизнес-встреча'
+              description='Обсуждение нового проекта'
+              date='18 декабря'
+              time='14:00'
+              location='Кофейня "Работа"'
+              category='business'
+              attendees={4}
+              onPress={() => alert('Открыть событие')}
+              style={styles.eventCard}
+            />
+          </View>
+        </ScrollView>
+      </GlassContainer>
+
+      {/* Friends Online */}
+      <GlassContainer style={styles.friendsSection} variant='elevated'>
+        <ThemedText type='subtitle' style={styles.sectionTitle}>
+          Друзья поблизости
+        </ThemedText>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={styles.friendsList}>
+            {friends.map((friend) => (
+              <FriendPin
+                key={friend.id}
+                name={friend.name.split(' ')[0]}
+                status={friend.status}
+                distance={friend.distance}
+                onPress={() => handleFriendPress(friend)}
+              />
+            ))}
+          </View>
+        </ScrollView>
+      </GlassContainer>
+
+      {/* Friend Details Modal */}
+      <FriendDetailsModal
+        friend={selectedFriend}
+        visible={friendModalVisible}
+        onClose={() => {
+          setFriendModalVisible(false);
+          setSelectedFriend(null);
+        }}
+        onMessageFriend={handleMessageFriend}
+        onNavigateToFriend={handleNavigateToFriend}
+        onCallFriend={handleCallFriend}
+      />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.light.background,
+    paddingTop: 40,
+  },
+  headerSection: {
+    margin: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  userInfo: {
+    flex: 1,
+  },
+  userEmail: {
+    fontSize: 14,
+    color: Colors.light.textSecondary,
+    marginTop: Spacing.xs,
+  },
+  logoutButton: {
+    padding: Spacing.sm,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 107, 107, 0.1)',
+  },
+  welcomeSection: {
+    margin: Spacing.md,
+    marginBottom: Spacing.lg,
+  },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  welcomeTitle: {
+    fontSize: 24,
+    fontWeight: '700',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  welcomeSubtitle: {
+    fontSize: 16,
+    color: Colors.light.textSecondary,
+    lineHeight: 22,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: Spacing.md,
+  },
+  eventsSection: {
+    margin: Spacing.md,
+    marginBottom: Spacing.lg,
+  },
+  eventsList: {
+    flexDirection: 'row',
+    gap: Spacing.md,
+    paddingRight: Spacing.md,
+  },
+  eventCard: {
+    width: 280,
+    marginBottom: 0,
+  },
+  friendsSection: {
+    margin: Spacing.md,
+    marginBottom: Spacing.xl,
+  },
+  friendsList: {
+    flexDirection: 'row',
+    gap: Spacing.md,
+    paddingRight: Spacing.md,
   },
 });
